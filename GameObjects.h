@@ -21,7 +21,9 @@ struct Wall: public GameObject, public QGraphicsItem{
         : coordinates_(x,y)
         , width_(width)
         , length_(length)
-        {setPos(x,y);}
+    {
+        setPos(x,y);
+    }
 
     QPoint coordinates_;
     int width_;
@@ -31,7 +33,7 @@ struct Wall: public GameObject, public QGraphicsItem{
         return QRectF(0, 0, width_, length_);
     }
     void paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) override{
-        painter->fillRect(boundingRect(), QColor(80, 70, 60)); // Тёмно-коричневые
+        painter->fillRect(boundingRect(), QColor(80, 70, 60));
         painter->setPen(QPen(Qt::black, 1));
         painter->drawRect(boundingRect());
     }

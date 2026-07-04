@@ -12,24 +12,28 @@ public:
     Ant(int x,int y, int R, QString caste)
         : coordinates_(x,y)
         , radius_(R)
-        , caste_(caste){}
+        , caste_(caste)
+    {
+        setPos(x, y);
+    }
 
     QString caste_;
     QString portableResource_;
     QPoint coordinates_;
-    short HP_;
-    short angle_;
+    int angle_ = 0;
+    short HP_ = 10;
+                                                                                                //Чинить
     void paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) override {
-        // Тело — красный круг
+        // Тело — красный овал
         painter->setBrush(Qt::red);
         painter->setPen(Qt::NoPen);
-        painter->drawEllipse(-radius_, -radius_, radius_*2, radius_*2);
+        painter->drawEllipse(-radius_, -radius_, radius_*2, radius_);
 
         // Голова — чёрная точка в направлении угла
         painter->setBrush(Qt::black);
-        qreal headX = cos(angle_) * radius_ * 0.8;
-        qreal headY = sin(angle_) * radius_ * 0.8;
-        painter->drawEllipse(QPointF(headX, headY), 2, 2);
+        int  headX = cos(angle_) * radius_ * 0.8;
+        int  headY = sin(angle_) * radius_ * 0.8;
+        painter->drawEllipse(QPoint(headX, headY), 2, 2);
     }
 };
 

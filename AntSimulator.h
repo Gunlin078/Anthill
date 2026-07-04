@@ -6,6 +6,8 @@
 #include <QMainWindow>
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QTimer>
+#include <atomic>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -19,27 +21,35 @@ class AntSimulator : public QMainWindow
 
 public:
     AntSimulator(QWidget *parent = nullptr);
-    void createMap();
     ~AntSimulator();
-
+    void createMap();
+    void toggleUpdates();
 private:
     Ui::AntSimulator *ui;
-    QGraphicsScene* m_scene;
-    QGraphicsView* m_view;
+    QGraphicsScene* scene_;
+    QGraphicsView* view_;
+    QTimer *updateTimer_ = nullptr;
 
-    QList<Wall*> m_walls;
-    QList<Resource*> m_resources;
-    QList<Ant*> m_ants;
-    Nest* m_nest;
+    QList<Wall*> walls_;
+    QList<Resource*> resources_;
+    QList<Ant*> ants_;
+    Nest* nest_;
+
+    /*
+    std::mutex mtx;
+    std::condition_variable cv;
+    bool GameRunning{true};
+    */
 };
 
 struct Config{
-    inline static int SCENE_WIDTH = 500;
     inline static int SCENE_HEIGHT = 500;
+    inline static int SCENE_WIDTH = 500;
     inline static int WALL_THICKNESS = 5;
-    inline static int NEST_RADIUS = 20;
     inline static int RESOURCE_COUNT = 2;
+    inline static int NEST_ENTRANCE_RADIUS = 20;
 
+    inline static int ANT_RADIUS = 10;
     inline static int ANT_COUNT = 10;
 };
 #endif // ANTSIMULATOR_H
