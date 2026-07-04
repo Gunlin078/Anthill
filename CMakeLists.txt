@@ -14,15 +14,20 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 set(PROJECT_SOURCES
         main.cpp
-        antsimulator.cpp
-        antsimulator.h
-        antsimulator.ui
+        AntSimulator.cpp
+        AntSimulator.h
+        AntSimulator.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(Anthill
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+
+        GameObjects.h
+        Nest.h
+        Ant.h Ant.cpp
+
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET Anthill APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
