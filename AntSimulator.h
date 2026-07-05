@@ -7,7 +7,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QTimer>
-#include <QPointer>
+#include <QRandomGenerator>
 #include <atomic>
 
 QT_BEGIN_NAMESPACE
@@ -42,9 +42,9 @@ struct Config{
     inline static int SCENE_WIDTH = 500;
     inline static int WALL_THICKNESS = 5;
     inline static int RESOURCE_COUNT = 2;
-    inline static int NEST_ENTRANCE_RADIUS = 20;
+    inline static int NEST_ENTRANCE_RADIUS = 40;
 
-    inline static int ANT_RADIUS = 10;
-    inline static int ANT_COUNT = 1;
+    inline static int ANT_RADIUS = 5;
+    inline static int ANT_COUNT = 40;
 };
 #endif // ANTSIMULATOR_H

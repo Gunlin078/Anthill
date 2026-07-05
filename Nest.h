@@ -19,7 +19,7 @@ public:
         QGraphicsEllipseItem* outerRing = new QGraphicsEllipseItem(
             -outerRadius, -outerRadius, outerRadius * 2, outerRadius * 2, this);
         outerRing->setBrush(QColor(0,0,0,0));
-        outerRing->setPen(QPen(QColor(149, 102, 70), radius*0.5));
+        outerRing->setPen(QPen(QColor(149, 102, 70), radius*0.6));
         outerRing->setZValue(-1);
     }
 private:

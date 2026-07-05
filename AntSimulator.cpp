@@ -64,9 +64,15 @@ void AntSimulator::createMap() {
     scene_->addItem(nest_);
 
     // 4: Муравьи (стартуют у муравейника на случайном расстоянии от 0 до 2Rw)       Не работает
-
     for (int i = 0; i < Config::ANT_COUNT; ++i) {
-        Ant* ant = new AntWorker(w/2, h/2, Config::ANT_RADIUS);
+        int r = QRandomGenerator::global()->bounded(static_cast<int>(Config::NEST_ENTRANCE_RADIUS*0.9),
+                                                    static_cast<int>(Config::NEST_ENTRANCE_RADIUS*1.5));
+
+        double angle = QRandomGenerator::global()->bounded(360) * M_PI / 180.0;
+        int x = w/2 + static_cast<int>(r * qCos(angle));
+        int y = h/2 + static_cast<int>(r * qSin(angle));
+
+        Ant* ant = new AntWorker(x, y, Config::ANT_RADIUS);
         scene_->addItem(ant);
         ants_.append(ant);
     }
@@ -88,7 +94,7 @@ void AntSimulator::toggleUpdates()
         updateTimer_->setInterval(50);
         connect(updateTimer_, &QTimer::timeout, this, [this]() {
             update();
-            qDebug() << "Updating"; ///отладочное
+            //qDebug() << "Updating"; ///отладочное
         });
     }
 

@@ -9,11 +9,11 @@ class Ant : public QGraphicsEllipseItem
 public:
     virtual ~Ant() = default;
     void spawn();
-    void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;///надо чинить
+    void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;///нужен фронтендер
 protected:
     Ant(int x,int y, int R)
         : coordinates_(x,y)
-        , radius_(R){setPos(x+50, y);}///убрать 50, это временное
+        , radius_(R){setPos(x, y);}
     QPoint coordinates_;
     int angle_ = 0;
     short radius_;
