@@ -1,6 +1,10 @@
 #include "AntSimulator.h"
 #include "./ui_AntSimulator.h"
 
+#define W Config::SCENE_WIDTH
+#define H Config::SCENE_HEIGHT
+#define T Config::WALL_THICKNESS
+
 AntSimulator::AntSimulator(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::AntSimulator)
@@ -34,24 +38,21 @@ AntSimulator::~AntSimulator()
 }
 
 void AntSimulator::createMap() {
-    int w = Config::SCENE_WIDTH;
-    int h = Config::SCENE_HEIGHT;
-    int t = Config::WALL_THICKNESS;
     // 1: Фон (когда то потом)
     // 2: Стены по периметру
-    Wall* topWall = new Wall(0, 0, w, t);
+    Wall* topWall = new Wall(0, 0, W, T);
     scene_->addItem(topWall);
     walls_.append(topWall);
 
-    Wall* bottomWall = new Wall(0, h - t, w, t);
+    Wall* bottomWall = new Wall(0, H - T, W, T);
     scene_->addItem(bottomWall);
     walls_.append(bottomWall);
 
-    Wall* leftWall = new Wall(0, 0, t, h);
+    Wall* leftWall = new Wall(0, 0, T, H);
     scene_->addItem(leftWall);
     walls_.append(leftWall);
 
-    Wall* rightWall = new Wall(w - t, 0, t, h);
+    Wall* rightWall = new Wall(W - T, 0, T, H);
     scene_->addItem(rightWall);
     walls_.append(rightWall);
 
@@ -60,19 +61,12 @@ void AntSimulator::createMap() {
     }
 
     // 3: Муравейник в центре
-    nest_ = new Nest(w/2, h/2, Config::NEST_ENTRANCE_RADIUS);
+    nest_ = new Nest(W/2, H/2, Config::NEST_ENTRANCE_RADIUS);
     scene_->addItem(nest_);
 
-    // 4: Муравьи (стартуют у муравейника на случайном расстоянии от 0 до 2Rw)       Не работает
+    // 4: Муравьи (стартуют у муравейника рядом со входом)
     for (int i = 0; i < Config::ANT_COUNT; ++i) {
-        int r = QRandomGenerator::global()->bounded(static_cast<int>(Config::NEST_ENTRANCE_RADIUS*0.9),
-                                                    static_cast<int>(Config::NEST_ENTRANCE_RADIUS*1.5));
-
-        double angle = QRandomGenerator::global()->bounded(360) * M_PI / 180.0;
-        int x = w/2 + static_cast<int>(r * qCos(angle));
-        int y = h/2 + static_cast<int>(r * qSin(angle));
-
-        Ant* ant = new AntWorker(x, y, Config::ANT_RADIUS);
+        Ant* ant = new AntWorker(Config::ANT_RADIUS);
         scene_->addItem(ant);
         ants_.append(ant);
     }

@@ -2,18 +2,21 @@
 #define ANT_H
 
 #include <QGraphicsEllipseItem>
+#include <QRandomGenerator>
 #include <QPainter>
 
 class Ant : public QGraphicsEllipseItem
 {
 public:
     virtual ~Ant() = default;
-    void spawn();
+    QPoint getSpawnPoint();
     void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;///нужен фронтендер
 protected:
-    Ant(int x,int y, int R)
-        : coordinates_(x,y)
-        , radius_(R){setPos(x, y);}
+    Ant(int R)
+        : radius_(R)
+    {
+        setPos(getSpawnPoint());
+    }
     QPoint coordinates_;
     int angle_ = 0;
     short radius_;
@@ -22,8 +25,8 @@ protected:
 class AntWorker: public Ant{
 public:
     ~AntWorker() = default;
-    AntWorker(int x,int y, int R)
-        : Ant(x, y, R){}
+    AntWorker(int R)
+        : Ant(R){}
 private:
     QString portableResource_;
     short HP_ = 10;
@@ -33,8 +36,8 @@ private:
 class AntWarrior: public Ant{
 public:
     ~AntWarrior() = default;
-    AntWarrior(int x,int y, int R)
-        : Ant(x, y, R){}
+    AntWarrior(int R)
+        : Ant(R){}
 private:
     short attack = 4;
     short HP_ = 20;
@@ -44,8 +47,8 @@ private:
 class AntScout: public Ant{
 public:
     ~AntScout() = default;
-    AntScout(int x,int y, int R)
-        : Ant(x, y, R){}
+    AntScout(int R)
+        : Ant(R){}
 private:
     short attack = 1;
     short HP_ = 15;
