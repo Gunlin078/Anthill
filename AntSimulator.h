@@ -7,6 +7,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QTimer>
+#include <QPointer>
 #include <atomic>
 
 QT_BEGIN_NAMESPACE
@@ -34,12 +35,6 @@ private:
     QList<Resource*> resources_;
     QList<Ant*> ants_;
     Nest* nest_;
-
-    /*
-    std::mutex mtx;
-    std::condition_variable cv;
-    bool GameRunning{true};
-    */
 };
 
 struct Config{
@@ -50,6 +45,6 @@ struct Config{
     inline static int NEST_ENTRANCE_RADIUS = 20;
 
     inline static int ANT_RADIUS = 10;
-    inline static int ANT_COUNT = 10;
+    inline static int ANT_COUNT = 1;
 };
 #endif // ANTSIMULATOR_H

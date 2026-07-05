@@ -16,9 +16,20 @@ AntSimulator::AntSimulator(QWidget *parent)
     createMap();
     toggleUpdates();
 }
-
 AntSimulator::~AntSimulator()
 {
+    qDeleteAll(walls_);
+    walls_.clear();
+
+    qDeleteAll(resources_);
+    resources_.clear();
+
+    qDeleteAll(ants_);
+    ants_.clear();
+
+    delete nest_;
+    nest_ = nullptr;
+
     delete ui;
 }
 
@@ -44,6 +55,10 @@ void AntSimulator::createMap() {
     scene_->addItem(rightWall);
     walls_.append(rightWall);
 
+    for (Wall* wall : walls_) {
+        wall->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
+    }
+
     // 3: Муравейник в центре
     nest_ = new Nest(w/2, h/2, Config::NEST_ENTRANCE_RADIUS);
     scene_->addItem(nest_);
@@ -51,7 +66,7 @@ void AntSimulator::createMap() {
     // 4: Муравьи (стартуют у муравейника на случайном расстоянии от 0 до 2Rw)       Не работает
 
     for (int i = 0; i < Config::ANT_COUNT; ++i) {
-        Ant* ant = new Ant(w/2, h/2, Config::ANT_RADIUS, "Worker");
+        Ant* ant = new AntWorker(w/2, h/2, Config::ANT_RADIUS);
         scene_->addItem(ant);
         ants_.append(ant);
     }
@@ -73,7 +88,7 @@ void AntSimulator::toggleUpdates()
         updateTimer_->setInterval(50);
         connect(updateTimer_, &QTimer::timeout, this, [this]() {
             update();
-            qDebug() << "Updating"; //отладочное
+            qDebug() << "Updating"; ///отладочное
         });
     }
 
@@ -81,7 +96,7 @@ void AntSimulator::toggleUpdates()
         updateTimer_->stop();
     } else {
         updateTimer_->start();
-    }//можно заменить тернарником
+    }///можно заменить тернарником
 }
 
 /* тут я химичил с мютексами, смотреть не надо, это на гиппотетическое будущее
@@ -98,4 +113,9 @@ void AntSimulator::gameOnOff()
     if (GameRunning == true) {GameRunning = false;}
     else {GameRunning = true;}
 }
+
+    std::mutex mtx;
+    std::condition_variable cv;
+    bool GameRunning{true};
+
 */

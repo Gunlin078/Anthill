@@ -6,35 +6,49 @@
 
 class Ant : public QGraphicsEllipseItem
 {
-private:
-    int radius_ = 1;
 public:
-    Ant(int x,int y, int R, QString caste)
+    virtual ~Ant() = default;
+    void spawn();
+    void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;///надо чинить
+protected:
+    Ant(int x,int y, int R)
         : coordinates_(x,y)
-        , radius_(R)
-        , caste_(caste)
-    {
-        setPos(x, y);
-    }
-
-    QString caste_;
-    QString portableResource_;
+        , radius_(R){setPos(x+50, y);}///убрать 50, это временное
     QPoint coordinates_;
     int angle_ = 0;
-    short HP_ = 10;
-                                                                                                //Чинить
-    void paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) override {
-        // Тело — красный овал
-        painter->setBrush(Qt::red);
-        painter->setPen(Qt::NoPen);
-        painter->drawEllipse(-radius_, -radius_, radius_*2, radius_);
-
-        // Голова — чёрная точка в направлении угла
-        painter->setBrush(Qt::black);
-        int  headX = cos(angle_) * radius_ * 0.8;
-        int  headY = sin(angle_) * radius_ * 0.8;
-        painter->drawEllipse(QPoint(headX, headY), 2, 2);
-    }
+    short radius_;
 };
 
+class AntWorker: public Ant{
+public:
+    ~AntWorker() = default;
+    AntWorker(int x,int y, int R)
+        : Ant(x, y, R){}
+private:
+    QString portableResource_;
+    short HP_ = 10;
+    short speed = 3;
+};
+
+class AntWarrior: public Ant{
+public:
+    ~AntWarrior() = default;
+    AntWarrior(int x,int y, int R)
+        : Ant(x, y, R){}
+private:
+    short attack = 4;
+    short HP_ = 20;
+    short speed = 2;
+};
+
+class AntScout: public Ant{
+public:
+    ~AntScout() = default;
+    AntScout(int x,int y, int R)
+        : Ant(x, y, R){}
+private:
+    short attack = 1;
+    short HP_ = 15;
+    short speed = 4;
+};
 #endif // ANT_H

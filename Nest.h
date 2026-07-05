@@ -1,7 +1,7 @@
 #ifndef NEST_H
 #define NEST_H
 #include <QGraphicsEllipseItem>
-
+// Отдельно от остальных, т.к. в будущем появится вид сбоку
 class Nest : public QGraphicsEllipseItem
 {
 public:
@@ -14,7 +14,7 @@ public:
         setBrush(QColor(54, 38, 27));
         setPen(QPen(QColor(115, 79, 54), radius*0.6));
 
-        //Ещё одно кольцо вокруг
+        // Ещё одно кольцо вокруг
         int outerRadius = radius + (radius * 0.3);
         QGraphicsEllipseItem* outerRing = new QGraphicsEllipseItem(
             -outerRadius, -outerRadius, outerRadius * 2, outerRadius * 2, this);
