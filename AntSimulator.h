@@ -21,9 +21,11 @@ class AntSimulator : public QMainWindow
 
 public:
     AntSimulator(QWidget *parent = nullptr);
+    void play();
+    void stop();
     ~AntSimulator();
     void createMap();
-    void toggleUpdates();
+    void toggleUpdates(bool);
 private:
     Ui::AntSimulator *ui;
     QGraphicsScene* scene_;
@@ -34,6 +36,7 @@ private:
     QList<Resource*> resources_;
     QList<Ant*> ants_;
     Nest* nest_;
+    bool isPlaying_;
 };
 
 struct Config{
@@ -42,8 +45,10 @@ struct Config{
     inline static int WALL_THICKNESS = 10;
     inline static int RESOURCE_COUNT = 2;
     inline static int NEST_ENTRANCE_RADIUS = 40;
+    inline static int FPS = 20;
 
     inline static int ANT_RADIUS = 5;
     inline static int ANT_COUNT = 40;
+
 };
 #endif // ANTSIMULATOR_H

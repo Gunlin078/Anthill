@@ -5,7 +5,6 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     AntSimulator game;
-    //game.showFullScreen();
-    game.show();
+    game.play();
     return a.exec();
 }

@@ -11,6 +11,7 @@ AntSimulator::AntSimulator(QWidget *parent)
     , scene_(new QGraphicsScene(this))
     , view_(new QGraphicsView(scene_, this))
     , nest_(nullptr)
+    , isPlaying_(false)
 {
     ui->setupUi(this);
     view_->setRenderHint(QPainter::Antialiasing);
@@ -18,8 +19,25 @@ AntSimulator::AntSimulator(QWidget *parent)
     setCentralWidget(view_);
 
     createMap();
-    toggleUpdates();
 }
+
+void AntSimulator::play()
+{
+    if (isPlaying_ == false){
+        this->show();
+        isPlaying_ = true;
+        toggleUpdates(true);
+    }
+}
+
+void AntSimulator::stop()
+{
+    if (isPlaying_ == true){
+        isPlaying_ = false;
+        toggleUpdates(false);
+    }
+}
+
 AntSimulator::~AntSimulator()
 {
     qDeleteAll(walls_);
@@ -38,7 +56,7 @@ AntSimulator::~AntSimulator()
 }
 
 void AntSimulator::createMap() {
-    // 1: Фон (когда то потом)
+    // 1: Фон (когда то сильно потом)
     // 2: Стены по периметру
     Wall* topWall = new Wall(0, 0, W, T);
     scene_->addItem(topWall);
@@ -77,45 +95,33 @@ void AntSimulator::createMap() {
         scene_->addItem(r);
         resources_.append(r);
     }*/
-
 }
 
-void AntSimulator::toggleUpdates()
+void AntSimulator::toggleUpdates(bool starting)
 {
+    if (starting) {
+        if (!updateTimer_) {
+            updateTimer_ = new QTimer(this);
+            updateTimer_->setTimerType(Qt::PreciseTimer);
+            updateTimer_->setInterval(1000 / Config::FPS);
+            connect(updateTimer_, &QTimer::timeout, this, [this]() {
+                update();
+                qDebug() << "Updating";///отладочное
+            });
+        }
+
+        if (!updateTimer_->isActive()) {
+            updateTimer_->start();
+        }
+        return;
+    }
+
     if (!updateTimer_) {
-        updateTimer_ = new QTimer(this);
-        updateTimer_->setTimerType(Qt::PreciseTimer);
-        updateTimer_->setInterval(50);
-        connect(updateTimer_, &QTimer::timeout, this, [this]() {
-            update();
-            //qDebug() << "Updating"; ///отладочное
-        });
+        qDebug() << "The game loop hasn't yet been launched";
+        return;
     }
 
     if (updateTimer_->isActive()) {
         updateTimer_->stop();
-    } else {
-        updateTimer_->start();
-    }///можно заменить тернарником
+    }
 }
-
-/* тут я химичил с мютексами, смотреть не надо, это на гиппотетическое будущее
-while (true)
-{
-    std::unique_lock<std::mutex> lock(mtx);
-    cv.wait(lock, [this] { return GameRunning; });
-
-    lock.unlock();
-}
-void AntSimulator::gameOnOff()
-{
-    std::lock_guard<std::mutex> lock(mtx);
-    if (GameRunning == true) {GameRunning = false;}
-    else {GameRunning = true;}
-}
-
-    std::mutex mtx;
-    std::condition_variable cv;
-    bool GameRunning{true};
-
-*/
