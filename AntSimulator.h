@@ -38,6 +38,10 @@ private:
     QList<Resource*> resources_;
     QList<Ant*> ants_;
     Nest* nest_;
+
+    long long lastRestorationCheckTime_ = 0;
+    static constexpr long long CHECK_INTERVAL_SEC = 1;
+
     bool isPlaying_;
 };
 #endif // ANTSIMULATOR_H

@@ -28,6 +28,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Nest.h
         Ant.h Ant.cpp
         Configs.h
+        GameObjects.cpp
 
     )
 # Define target properties for Android with Qt 6 as:

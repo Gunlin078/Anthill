@@ -1,50 +1,67 @@
 #ifndef GAMEOBJECTS_H
 #define GAMEOBJECTS_H
 #include <QStyleOptionGraphicsItem>
+#include <QRandomGenerator>
 #include <QGraphicsItem>
+#include <QDateTime>
 #include <QPainter>
-
-// Если определен флаг релиза, то макрос станет заглушкой
-#ifdef NDEBUG
-#define LOG_MSG(x)
-#else
-#define LOG_MSG(x) qDebug() << x
-#endif
+#include "Configs.h"
+class ResourceManager;
+class Resource;
 
 struct GameObject{
     virtual ~GameObject() = default;
 };
 
 //dynamic object
-struct Resource: public GameObject{
+struct Resource : public GameObject, public QGraphicsEllipseItem{
 public:
     ~Resource() override = default;
-    QString name_;
-    QColor color_;
-    short count_;
-    short productionSpeed_;
+    void remove();
+    void restore();
+
 protected:
     Resource(QString name, QColor color, short count, short V)
         : name_(name)
         , color_(color)
         , count_(count)
-        , productionSpeed_(V){}
+        , productionSpeed_(V)
+        , initialCount_(count)
+        , QGraphicsEllipseItem(0, 0, 8, 16)//Случайное, нужен фронтендер
+    {
+        int x = QRandomGenerator::global()->bounded(Config::NEST_ENTRANCE_RADIUS*3, std::min(Config::SCENE_HEIGHT, Config::SCENE_WIDTH));
+        int y = QRandomGenerator::global()->bounded(Config::NEST_ENTRANCE_RADIUS*3, std::min(Config::SCENE_HEIGHT, Config::SCENE_WIDTH));
+        setPos(x,y);
+
+        setBrush(QColor(color_));
+        setPen(QPen(QColor(color_), 8));
+    }
+
+    QString name_;
+    QColor color_;
+    long long restorationDeadline_;
+    short count_;
+    short productionSpeed_;
+    short initialCount_;
+    bool isActive_ = true;
+
     friend class ResourceFactory;
+    friend class ResourceManager;
 };
 
 class ResourceFactory{
 public:
     static Resource* createByType(const QString& type) {
-        if (type == "Branch") return createLeaf();
+        if (type == "Branch") return createBranch();
         if (type == "Acorn") return createAcorn();
         if (type == "Leaf") return createLeaf();
-        LOG_MSG("The resource factory received an unknown type");
+        qWarning() << "The resource factory received an unknown type";
         return nullptr;
     }
 
 private:
     static Resource* createBranch() {
-        return new Resource({"Branch", QColor(133, 99, 48), 100, 20});
+        return new Resource({"Branch", QColor(100, 80, 48), 100, 20});
     }
 
     static Resource* createAcorn() {
@@ -56,10 +73,16 @@ private:
     }
 
 };
-// Использование:
-//auto* acorn = ResourceFactory::createAcorn();
-//auto* leaf = ResourceFactory::createLeaf();
 
+class ResourceManager {
+public:
+    static void scheduleRestoration(Resource* res);
+    static void checkRestorations(long long currentTimeSec);
+    static void clearAll();
+
+private:
+    static QList<Resource*> pendingResources_;
+};
 
 //static object
 struct Wall: public GameObject, public QGraphicsItem{

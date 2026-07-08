@@ -43,6 +43,7 @@ AntSimulator::~AntSimulator()
     qDeleteAll(walls_);
     walls_.clear();
 
+    ResourceManager::clearAll();
     qDeleteAll(resources_);
     resources_.clear();
 
@@ -89,12 +90,14 @@ void AntSimulator::createMap() {
         ants_.append(ant);
     }
     // 5: Ресурсы (разбросать случайно)
-    /*
     for (int i = 0; i < Config::RESOURCE_COUNT; ++i) {
-        Resource* r = new Resource(randomX(), randomY(), Resource::Mined);
-        scene_->addItem(r);
-        resources_.append(r);
-    }*/
+        Resource* branch = ResourceFactory::createByType("Branch");
+        Resource* acorn = ResourceFactory::createByType("Acorn");
+        Resource* leaf = ResourceFactory::createByType("Leaf");
+        scene_->addItem(branch);    resources_.append(branch);
+        scene_->addItem(acorn);     resources_.append(acorn);
+        scene_->addItem(leaf);      resources_.append(leaf);
+    }
 }
 
 void AntSimulator::toggleUpdates(bool starting)
@@ -106,7 +109,14 @@ void AntSimulator::toggleUpdates(bool starting)
             updateTimer_->setInterval(1000 / Config::FPS);
             connect(updateTimer_, &QTimer::timeout, this, [this]() {
                 update();
-                qDebug() << "Updating";///отладочное
+                for (Ant* ant: ants_) {ant->updatePosition();}
+                //LOG_MSG("Updating");///отладочное
+                // Проверка восстановления ресурсов (не чаще чем раз в секунду)
+                long long now = QDateTime::currentSecsSinceEpoch();
+                if (now - lastRestorationCheckTime_ >= CHECK_INTERVAL_SEC) {
+                    ResourceManager::checkRestorations(now);
+                    lastRestorationCheckTime_ = now;
+                }
             });
         }
 
