@@ -1,13 +1,14 @@
 #ifndef ANTSIMULATOR_H
 #define ANTSIMULATOR_H
 #include "Ant.h"
+#include "Configs.h"
 #include "GameObjects.h"
 #include "Nest.h"
 #include <QMainWindow>
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QKeyEvent>
 #include <QTimer>
-//#include <atomic>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -26,6 +27,7 @@ public:
     ~AntSimulator();
     void createMap();
     void toggleUpdates(bool);
+    void keyPressEvent(QKeyEvent *event) override;
 private:
     Ui::AntSimulator *ui;
     QGraphicsScene* scene_;
@@ -37,18 +39,5 @@ private:
     QList<Ant*> ants_;
     Nest* nest_;
     bool isPlaying_;
-};
-
-struct Config{
-    inline static int SCENE_HEIGHT = 500;
-    inline static int SCENE_WIDTH = 500;
-    inline static int WALL_THICKNESS = 10;
-    inline static int RESOURCE_COUNT = 2;
-    inline static int NEST_ENTRANCE_RADIUS = 40;
-    inline static int FPS = 20;
-
-    inline static int ANT_RADIUS = 5;
-    inline static int ANT_COUNT = 40;
-
 };
 #endif // ANTSIMULATOR_H

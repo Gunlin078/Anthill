@@ -1,5 +1,5 @@
 #include "Ant.h"
-#include "AntSimulator.h"
+#include "Configs.h"
 
 #define W Config::SCENE_WIDTH
 #define H Config::SCENE_HEIGHT
@@ -27,3 +27,30 @@ void Ant::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*){
     int  headY = sin(angle_) * radius_ * 0.8;
     painter->drawEllipse(QPoint(headX, headY), 2, 2);
 }// Пример!!! Из готовых вариантов: ещё можно делать как гнездо
+
+
+void Ant::moveTo(const QPoint &p)                                              // Пример: currentPos_ = (0;0), а p = (3;4)
+{                                                                               // Начало в (0;0), а цель в (3;4)
+    if (p == currentPos_.toPoint()) return;
+    isMoving_ = true;
+    targetPos_ = p;                                                             // targetPos_ = (3;4)
+    direction_ = targetPos_ - currentPos_;                                      // direction_ = (3;4) - (0;0) = (3;4)
+    distanceToTarget_ = std::hypot(direction_.x(), direction_.y());             // distanceToTarget_ = sqrt( 3*3+4*4 ) = 5
+    if (distanceToTarget_ > 0.0001f)
+        direction_ /= distanceToTarget_;                                        // direction_ = (3;4) / 5 =  (0.6;0.8) - единичный вектор
+}                                                                               // То есть пройдя 1 у.е., к текущим координатам прибавится (0.6;0.8)
+
+void Ant::updatePosition()
+{
+    if (!isMoving_) return;
+
+    distanceToTarget_ -= step_;                                                 // Осталось пройти: 5 - шаг
+    if (distanceToTarget_ <= 0) {
+        currentPos_ = targetPos_;
+        isMoving_ = false;
+        distanceToTarget_ = 0;
+    } else {
+        currentPos_ += direction_ * step_;                                       // Текущее положение: (0;0) + (0.6;0.8)*шаг
+    }
+    setPos(currentPos_);
+}

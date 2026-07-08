@@ -125,3 +125,14 @@ void AntSimulator::toggleUpdates(bool starting)
         updateTimer_->stop();
     }
 }
+
+void AntSimulator::keyPressEvent(QKeyEvent *event){
+    if (event->key() == Qt::Key_Escape){
+        //потом заменить на функцию открытия менюшки паузы, в которой вызовется стоп
+        if (isPlaying_) stop();
+        else play();
+    } else {
+        QWidget::keyPressEvent(event);
+    }
+}
+
