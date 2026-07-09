@@ -10,8 +10,8 @@ QPoint Ant::getSpawnPoint()
                                                 static_cast<int>(Config::NEST_ENTRANCE_RADIUS*1.5));
 
     double angle = QRandomGenerator::global()->bounded(360) * M_PI / 180.0;
-    int x = W/2 + static_cast<int>(r * qCos(angle));
-    int y = H/2 + static_cast<int>(r * qSin(angle));
+    int x = static_cast<int>(r * qCos(angle));
+    int y = static_cast<int>(r * qSin(angle));
     return {x, y};
 }
 

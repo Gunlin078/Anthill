@@ -14,7 +14,7 @@ PauseOverlay::PauseOverlay(QWidget *parent)
 
     continueButton_ = new QPushButton("Продолжить");
 
-    menuButton_ = new QPushButton("Выходц");
+    menuButton_ = new QPushButton("Выход");
 
     title_->setAlignment(Qt::AlignCenter);
 

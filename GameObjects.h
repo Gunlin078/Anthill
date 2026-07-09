@@ -14,7 +14,7 @@ struct GameObject{
 };
 
 //dynamic object
-struct Resource : public GameObject, public QGraphicsEllipseItem{
+struct Resource : public GameObject, public QGraphicsRectItem{
 public:
     ~Resource() override = default;
     void remove();
@@ -27,11 +27,19 @@ protected:
         , count_(count)
         , productionSpeed_(V)
         , initialCount_(count)
-        , QGraphicsEllipseItem(0, 0, 8, 16)//Случайное, нужен фронтендер
+        , QGraphicsRectItem(0, 0, 16, 16)//Случайное, нужен фронтендер
     {
-        int x = QRandomGenerator::global()->bounded(Config::NEST_ENTRANCE_RADIUS*3, std::min(Config::SCENE_HEIGHT, Config::SCENE_WIDTH));
-        int y = QRandomGenerator::global()->bounded(Config::NEST_ENTRANCE_RADIUS*3, std::min(Config::SCENE_HEIGHT, Config::SCENE_WIDTH));
-        setPos(x,y);
+        int minDist = Config::NEST_ENTRANCE_RADIUS * 3;
+
+        int maxX = static_cast<int>(Config::SCENE_WIDTH  * 0.4);
+        int maxY = static_cast<int>(Config::SCENE_HEIGHT * 0.4);
+
+        int x, y;
+        do {
+            x = QRandomGenerator::global()->bounded(2 * maxX + 1) - maxX;
+            y = QRandomGenerator::global()->bounded(2 * maxY + 1) - maxY;
+        } while (x*x + y*y < minDist*minDist);  // Исключение зоны вокруг гнезда
+        setPos(x, y);
 
         setBrush(QColor(color_));
         setPen(QPen(QColor(color_), 8));

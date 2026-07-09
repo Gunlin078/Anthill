@@ -8,7 +8,10 @@
 AntSimulator::AntSimulator(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::AntSimulator)
-    , scene_(new QGraphicsScene(this))
+    , scene_(new QGraphicsScene(-Config::SCENE_WIDTH/2,
+    -Config::SCENE_HEIGHT/2,
+    Config::SCENE_WIDTH,
+    Config::SCENE_HEIGHT))
     , view_(new QGraphicsView(scene_, this))
     , nest_(nullptr)
     , isPlaying_(false)
@@ -80,19 +83,20 @@ AntSimulator::~AntSimulator()
 void AntSimulator::createMap() {
     // 1: Фон (когда то сильно потом)
     // 2: Стены по периметру
-    Wall* topWall = new Wall(0, 0, W, T);
+    // Верхняя стена - от (-W/2, -H/2) до (W/2, -H/2 + T)
+    Wall* topWall = new Wall(-W/2, -H/2, W, T);
     scene_->addItem(topWall);
     walls_.append(topWall);
 
-    Wall* bottomWall = new Wall(0, H - T, W, T);
+    Wall* bottomWall = new Wall(-W/2, H/2 - T, W, T);
     scene_->addItem(bottomWall);
     walls_.append(bottomWall);
 
-    Wall* leftWall = new Wall(0, 0, T, H);
+    Wall* leftWall = new Wall(-W/2, -H/2, T, H);
     scene_->addItem(leftWall);
     walls_.append(leftWall);
 
-    Wall* rightWall = new Wall(W - T, 0, T, H);
+    Wall* rightWall = new Wall(W/2 - T, -H/2, T, H);
     scene_->addItem(rightWall);
     walls_.append(rightWall);
 
@@ -101,7 +105,7 @@ void AntSimulator::createMap() {
     }
 
     // 3: Муравейник в центре
-    nest_ = new Nest(W/2, H/2, Config::NEST_ENTRANCE_RADIUS);
+    nest_ = new Nest(0, 0, Config::NEST_ENTRANCE_RADIUS);
     scene_->addItem(nest_);
 
     // 4: Муравьи (стартуют у муравейника рядом со входом)
