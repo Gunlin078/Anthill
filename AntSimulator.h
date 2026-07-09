@@ -3,6 +3,7 @@
 #include "Ant.h"
 #include "Configs.h"
 #include "GameObjects.h"
+#include "PauseOverlay.h"
 #include "Nest.h"
 #include <QMainWindow>
 #include <QGraphicsScene>
@@ -28,6 +29,10 @@ public:
     void createMap();
     void toggleUpdates(bool);
     void keyPressEvent(QKeyEvent *event) override;
+
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+
 private:
     Ui::AntSimulator *ui;
     QGraphicsScene* scene_;
@@ -41,6 +46,7 @@ private:
 
     long long lastRestorationCheckTime_ = 0;
     static constexpr long long CHECK_INTERVAL_SEC = 1;
+    PauseOverlay* pauseOverlay_;
 
     bool isPlaying_;
 };
