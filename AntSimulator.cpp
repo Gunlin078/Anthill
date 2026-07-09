@@ -19,6 +19,27 @@ AntSimulator::AntSimulator(QWidget *parent)
     setCentralWidget(view_);
 
     createMap();
+    pauseOverlay_ = new PauseOverlay(this);
+    pauseOverlay_->setGeometry(rect());
+    connect(
+        pauseOverlay_,
+        &PauseOverlay::continueGame,
+        this,
+        [this]()
+        {
+            pauseOverlay_->hide();
+            play();
+        }
+        );
+    connect(
+        pauseOverlay_,
+        &PauseOverlay::exitToMenu,
+        this,
+        [this]()
+        {
+            close();
+        }
+        );
 }
 
 void AntSimulator::play()
@@ -137,12 +158,25 @@ void AntSimulator::toggleUpdates(bool starting)
 }
 
 void AntSimulator::keyPressEvent(QKeyEvent *event){
-    if (event->key() == Qt::Key_Escape){
-        //потом заменить на функцию открытия менюшки паузы, в которой вызовется стоп
-        if (isPlaying_) stop();
-        else play();
-    } else {
-        QWidget::keyPressEvent(event);
+    if(event->key()==Qt::Key_Escape)
+    {
+        if(isPlaying_)
+        {
+            stop();
+
+            pauseOverlay_->show();
+
+            pauseOverlay_->raise();
+
+            pauseOverlay_->setFocus();
+        }
     }
+}
+
+void AntSimulator::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+
+    pauseOverlay_->setGeometry(rect());
 }
 

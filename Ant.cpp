@@ -16,16 +16,67 @@ QPoint Ant::getSpawnPoint()
 }
 
 void Ant::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*){
-    // Тело — красный овал
-    painter->setBrush(Qt::red);
-    painter->setPen(Qt::NoPen);
-    painter->drawEllipse(-radius_, -radius_, radius_*2, radius_);
+    painter->save();
 
-    // Голова — чёрная точка в направлении угла
+    // Поворачиваем муравья по направлению движения
+    painter->rotate(angle_ * 180.0 / M_PI);
+
+    // ================= ЛАПКИ =================
+    QPen legPen(QColor(45, 25, 15));
+    legPen.setWidth(2);
+    legPen.setCapStyle(Qt::RoundCap);
+    painter->setPen(legPen);
+
+    // Левые
+    painter->drawLine(-2, -3, -8, -8);
+    painter->drawLine(3, 0, -8, 0);
+    painter->drawLine(-2, 3, -8, 8);
+
+    // Правые
+    painter->drawLine(-2, -3, 8, -8);
+    painter->drawLine(3, 0, 8, 0);
+    painter->drawLine(-2, 3, 8, 8);
+
+    painter->setPen(Qt::NoPen);
+
+    // ================= БРЮШКО =================
+    painter->setBrush(QColor(220, 30, 30));
+    painter->drawEllipse(QPointF(-8, 0), 6.5, 5.5);
+
+    // ================= ТАЛИЯ =================
+    painter->setBrush(QColor(220, 30, 30));
+    painter->drawEllipse(QPointF(0, 0), 2.2, 2.2);
+
+    // ================= ГРУДЬ =================
+    painter->setBrush(QColor(220, 30, 30));
+    painter->drawEllipse(QPointF(5, 0), 5, 4.5);
+
+    // ================= ГОЛОВА =================
+    painter->setBrush(QColor(120, 15, 15));
+    painter->drawEllipse(QPointF(12, 0), 4, 4);
+
+    // ================= УСИКИ =================
+    QPen antenna(QColor(35, 20, 20));
+    antenna.setWidth(2);
+    antenna.setCapStyle(Qt::RoundCap);
+    painter->setPen(antenna);
+
+    painter->drawLine(14, -2, 18, -6);
+    painter->drawLine(14, 2, 18, 6);
+
+    // ================= ГЛАЗА =================
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(Qt::white);
+
+    painter->drawEllipse(QPointF(13, -1.5), 1.0, 1.0);
+    painter->drawEllipse(QPointF(13, 1.5), 1.0, 1.0);
+
     painter->setBrush(Qt::black);
-    int  headX = cos(angle_) * radius_ * 0.8;
-    int  headY = sin(angle_) * radius_ * 0.8;
-    painter->drawEllipse(QPoint(headX, headY), 2, 2);
+
+    painter->drawEllipse(QPointF(13, -1.5), 0.4, 0.4);
+    painter->drawEllipse(QPointF(13, 1.5), 0.4, 0.4);
+
+    painter->restore();
 }// Пример!!! Из готовых вариантов: ещё можно делать как гнездо
 
 
