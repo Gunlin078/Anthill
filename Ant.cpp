@@ -15,11 +15,10 @@ QPoint Ant::getSpawnPoint()
     return {x, y};
 }
 
+QPointF Ant::getCurrentPos(){return currentPos_;}
+
 void Ant::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*){
     painter->save();
-
-    // Поворачиваем муравья по направлению движения
-    painter->rotate(angle_ * 180.0 / M_PI);
 
     // ================= ЛАПКИ =================
     QPen legPen(QColor(45, 25, 15));
@@ -77,7 +76,7 @@ void Ant::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*){
     painter->drawEllipse(QPointF(13, 1.5), 0.4, 0.4);
 
     painter->restore();
-}// Пример!!! Из готовых вариантов: ещё можно делать как гнездо
+}
 
 
 void Ant::moveTo(const QPoint &p)                                              // Пример: currentPos_ = (0;0), а p = (3;4)
@@ -87,6 +86,11 @@ void Ant::moveTo(const QPoint &p)                                              /
     targetPos_ = p;                                                             // targetPos_ = (3;4)
     direction_ = targetPos_ - currentPos_;                                      // direction_ = (3;4) - (0;0) = (3;4)
     distanceToTarget_ = std::hypot(direction_.x(), direction_.y());             // distanceToTarget_ = sqrt( 3*3+4*4 ) = 5
+
+    // Поворот в сторону цели
+    angle_ = qRadiansToDegrees(qAtan2(direction_.y(), direction_.x()));
+    setRotation(angle_);
+
     if (distanceToTarget_ > 0.0001f)
         direction_ /= distanceToTarget_;                                        // direction_ = (3;4) / 5 =  (0.6;0.8) - единичный вектор
 }                                                                               // То есть пройдя 1 у.е., к текущим координатам прибавится (0.6;0.8)
@@ -96,7 +100,7 @@ void Ant::updatePosition()
     if (!isMoving_) return;
 
     distanceToTarget_ -= step_;                                                 // Осталось пройти: 5 - шаг
-    if (distanceToTarget_ <= 0) {
+    if (distanceToTarget_ <= step_) {
         currentPos_ = targetPos_;
         isMoving_ = false;
         distanceToTarget_ = 0;

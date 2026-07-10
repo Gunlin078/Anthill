@@ -11,13 +11,14 @@ class Ant : public QGraphicsEllipseItem
 {
 public:
     virtual ~Ant() = default;
+    QPointF getCurrentPos();
     QPoint getSpawnPoint();
-    void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;///нужен фронтендер
+    void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;
 
     void moveTo(const QPoint&);
     void updatePosition();
 protected:
-    Ant(int R): radius_(R)
+    Ant(int R, short speed): radius_(R), speed_(speed)
     {
         currentPos_ = getSpawnPoint();
         setPos(currentPos_);
@@ -38,32 +39,29 @@ class AntWorker: public Ant{
 public:
     ~AntWorker() = default;
     AntWorker(int R)
-        : Ant(R){}
+        : Ant(R, 20){}
 private:
     QString portableResource_;
     short HP_ = 10;
-    short speed_ = 3;
 };
 
 class AntWarrior: public Ant{
 public:
     ~AntWarrior() = default;
     AntWarrior(int R)
-        : Ant(R){}
+        : Ant(R, 30){}
 private:
     short attack_ = 4;
     short HP_ = 20;
-    short speed_ = 2;
 };
 
 class AntScout: public Ant{
 public:
     ~AntScout() = default;
     AntScout(int R)
-        : Ant(R){}
+        : Ant(R, 50){}
 private:
     short attack_ = 1;
     short HP_ = 15;
-    short speed_ = 4;
 };
 #endif // ANT_H

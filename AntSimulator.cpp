@@ -8,10 +8,11 @@
 AntSimulator::AntSimulator(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::AntSimulator)
-    , scene_(new QGraphicsScene(-Config::SCENE_WIDTH/2,
-    -Config::SCENE_HEIGHT/2,
-    Config::SCENE_WIDTH,
-    Config::SCENE_HEIGHT))
+    , scene_(new QGraphicsScene(
+        -Config::SCENE_WIDTH/2,
+        -Config::SCENE_HEIGHT/2,
+        Config::SCENE_WIDTH,
+        Config::SCENE_HEIGHT))
     , view_(new QGraphicsView(scene_, this))
     , nest_(nullptr)
     , isPlaying_(false)
@@ -24,25 +25,14 @@ AntSimulator::AntSimulator(QWidget *parent)
     createMap();
     pauseOverlay_ = new PauseOverlay(this);
     pauseOverlay_->setGeometry(rect());
-    connect(
-        pauseOverlay_,
-        &PauseOverlay::continueGame,
-        this,
-        [this]()
-        {
+    connect(pauseOverlay_, &PauseOverlay::continueGame, this, [this](){
             pauseOverlay_->hide();
             play();
-        }
-        );
-    connect(
-        pauseOverlay_,
-        &PauseOverlay::exitToMenu,
-        this,
-        [this]()
-        {
+        });
+    connect(pauseOverlay_, &PauseOverlay::exitToMenu, this, [this](){
             close();
-        }
-        );
+        });
+
 }
 
 void AntSimulator::play()
@@ -83,7 +73,6 @@ AntSimulator::~AntSimulator()
 void AntSimulator::createMap() {
     // 1: Фон (когда то сильно потом)
     // 2: Стены по периметру
-    // Верхняя стена - от (-W/2, -H/2) до (W/2, -H/2 + T)
     Wall* topWall = new Wall(-W/2, -H/2, W, T);
     scene_->addItem(topWall);
     walls_.append(topWall);
@@ -110,11 +99,11 @@ void AntSimulator::createMap() {
 
     // 4: Муравьи (стартуют у муравейника рядом со входом)
     for (int i = 0; i < Config::ANT_COUNT; ++i) {
-        Ant* ant = new AntWorker(Config::ANT_RADIUS);
+        Ant* ant = new AntScout(Config::ANT_RADIUS);
         scene_->addItem(ant);
         ants_.append(ant);
     }
-    // 5: Ресурсы (разбросать случайно)
+    // 5: Ресурсы
     for (int i = 0; i < Config::RESOURCE_COUNT; ++i) {
         Resource* branch = ResourceFactory::createByType("Branch");
         Resource* acorn = ResourceFactory::createByType("Acorn");
@@ -133,9 +122,13 @@ void AntSimulator::toggleUpdates(bool starting)
             updateTimer_->setTimerType(Qt::PreciseTimer);
             updateTimer_->setInterval(1000 / Config::FPS);
             connect(updateTimer_, &QTimer::timeout, this, [this]() {
-                update();
-                for (Ant* ant: ants_) {ant->updatePosition();}
+                scene_->update();
+                for (Ant* ant: ants_) {
+                    ant->updatePosition();
+                    //LOG_MSG(ant->getCurrentPos());
+                }
                 //LOG_MSG("Updating");///отладочное
+
                 // Проверка восстановления ресурсов (не чаще чем раз в секунду)
                 long long now = QDateTime::currentSecsSinceEpoch();
                 if (now - lastRestorationCheckTime_ >= CHECK_INTERVAL_SEC) {

@@ -9,7 +9,6 @@ public:
         : QGraphicsEllipseItem(-radius, -radius, radius*2, radius*2)
         , coordinates_(x,y)
         , radius_(radius)
-        , fullRadius_(radius*1.6)
     {
         setPos(x, y);
         setBrush(QColor(54, 38, 27));
@@ -23,10 +22,8 @@ public:
         outerRing->setPen(QPen(QColor(149, 102, 70), radius*0.6));
         outerRing->setZValue(-1);
     }
-    float GetFullRadius_() {return fullRadius_;}
 private:
     QPoint coordinates_;
-    float fullRadius_;
     int radius_;
 
 };
