@@ -5,7 +5,7 @@
 #include <QGraphicsItem>
 #include <QDateTime>
 #include <QPainter>
-#include "Configs.h"
+#include "Configs.hpp"
 class ResourceManager;
 class Resource;
 
@@ -27,9 +27,9 @@ protected:
         , count_(count)
         , productionSpeed_(V)
         , initialCount_(count)
-        , QGraphicsRectItem(0, 0, 16, 16)//Случайное, нужен фронтендер
+        , QGraphicsRectItem(0, 0, 160, 160)//Случайное, нужен фронтендер
     {
-        int minDist = Config::NEST_ENTRANCE_RADIUS * 3;
+        int minDist = Config::NEST_ENTRANCE_RADIUS * 6;
 
         int maxX = static_cast<int>(Config::SCENE_WIDTH  * 0.4);
         int maxY = static_cast<int>(Config::SCENE_HEIGHT * 0.4);

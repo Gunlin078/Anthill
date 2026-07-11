@@ -1,14 +1,14 @@
 #ifndef ANTSIMULATOR_H
 #define ANTSIMULATOR_H
+
 #include "Ant.h"
-#include "Configs.h"
+#include "Configs.hpp"
+#include "CustomGraphicsView.hpp"
 #include "GameObjects.h"
-#include "PauseOverlay.h"
-#include "Nest.h"
+#include "Nest.hpp"
 #include <QMainWindow>
 #include <QGraphicsScene>
 #include <QGraphicsView>
-#include <QKeyEvent>
 #include <QTimer>
 
 QT_BEGIN_NAMESPACE
@@ -28,15 +28,10 @@ public:
     ~AntSimulator();
     void createMap();
     void toggleUpdates(bool);
-    void keyPressEvent(QKeyEvent *event) override;
-
-protected:
-    void resizeEvent(QResizeEvent *event) override;
-
 private:
     Ui::AntSimulator *ui;
     QGraphicsScene* scene_;
-    QGraphicsView* view_;
+    CustomGraphicsView* view_;
     QTimer *updateTimer_ = nullptr;
 
     QList<Wall*> walls_;
@@ -44,10 +39,13 @@ private:
     QList<Ant*> ants_;
     Nest* nest_;
 
-    long long lastRestorationCheckTime_ = 0;
-    static constexpr long long CHECK_INTERVAL_SEC = 1;
     PauseOverlay* pauseOverlay_;
 
+    long long lastRestorationCheckTime_ = 0;
+    static constexpr long long CHECK_INTERVAL_SEC = 1;
+
     bool isPlaying_;
+    void resizeEvent(QResizeEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
 };
 #endif // ANTSIMULATOR_H

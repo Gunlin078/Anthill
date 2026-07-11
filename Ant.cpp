@@ -1,5 +1,5 @@
 #include "Ant.h"
-#include "Configs.h"
+#include "Configs.hpp"
 
 #define W Config::SCENE_WIDTH
 #define H Config::SCENE_HEIGHT

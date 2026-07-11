@@ -1,7 +1,7 @@
 #ifndef ANT_H
 #define ANT_H
 
-#include "Configs.h"
+#include "Configs.hpp"
 
 #include <QGraphicsEllipseItem>
 #include <QRandomGenerator>
@@ -18,7 +18,7 @@ public:
     void moveTo(const QPoint&);
     void updatePosition();
 protected:
-    Ant(int R, short speed): radius_(R), speed_(speed)
+    Ant(short speed):speed_(speed)
     {
         currentPos_ = getSpawnPoint();
         setPos(currentPos_);
@@ -30,7 +30,6 @@ protected:
     float distanceToTarget_{0};
     float step_{0};
     short speed_;
-    short radius_;
     short angle_{0};
     bool isMoving_{0};
 };
@@ -38,8 +37,8 @@ protected:
 class AntWorker: public Ant{
 public:
     ~AntWorker() = default;
-    AntWorker(int R)
-        : Ant(R, 20){}
+    AntWorker()
+        : Ant(20){}
 private:
     QString portableResource_;
     short HP_ = 10;
@@ -48,8 +47,8 @@ private:
 class AntWarrior: public Ant{
 public:
     ~AntWarrior() = default;
-    AntWarrior(int R)
-        : Ant(R, 30){}
+    AntWarrior()
+        : Ant(30){}
 private:
     short attack_ = 4;
     short HP_ = 20;
@@ -58,8 +57,8 @@ private:
 class AntScout: public Ant{
 public:
     ~AntScout() = default;
-    AntScout(int R)
-        : Ant(R, 50){}
+    AntScout()
+        : Ant(50){}
 private:
     short attack_ = 1;
     short HP_ = 15;

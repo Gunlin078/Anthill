@@ -13,11 +13,12 @@ AntSimulator::AntSimulator(QWidget *parent)
         -Config::SCENE_HEIGHT/2,
         Config::SCENE_WIDTH,
         Config::SCENE_HEIGHT))
-    , view_(new QGraphicsView(scene_, this))
+    , view_(new CustomGraphicsView(this))
     , nest_(nullptr)
     , isPlaying_(false)
 {
     ui->setupUi(this);
+    this->resize(1300, 820);
     view_->setRenderHint(QPainter::Antialiasing);
     view_->setScene(scene_);
     setCentralWidget(view_);
@@ -26,13 +27,12 @@ AntSimulator::AntSimulator(QWidget *parent)
     pauseOverlay_ = new PauseOverlay(this);
     pauseOverlay_->setGeometry(rect());
     connect(pauseOverlay_, &PauseOverlay::continueGame, this, [this](){
-            pauseOverlay_->hide();
-            play();
-        });
+        pauseOverlay_->hide();
+        play();
+    });
     connect(pauseOverlay_, &PauseOverlay::exitToMenu, this, [this](){
-            close();
-        });
-
+        close();
+    });
 }
 
 void AntSimulator::play()
@@ -98,10 +98,11 @@ void AntSimulator::createMap() {
     scene_->addItem(nest_);
 
     // 4: Муравьи (стартуют у муравейника рядом со входом)
-    for (int i = 0; i < Config::ANT_COUNT; ++i) {
-        Ant* ant = new AntScout(Config::ANT_RADIUS);
+    for (int i = 0; i < Config::ANT_WORKER_COUNT; ++i) {
+        Ant* ant = new AntScout();
         scene_->addItem(ant);
         ants_.append(ant);
+        ant->moveTo(QPoint(70*i, 80)); /////////////////////////////////////////////////////
     }
     // 5: Ресурсы
     for (int i = 0; i < Config::RESOURCE_COUNT; ++i) {
@@ -154,6 +155,13 @@ void AntSimulator::toggleUpdates(bool starting)
     }
 }
 
+void AntSimulator::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+
+    pauseOverlay_->setGeometry(rect());
+}
+
 void AntSimulator::keyPressEvent(QKeyEvent *event){
     if(event->key()==Qt::Key_Escape)
     {
@@ -169,11 +177,3 @@ void AntSimulator::keyPressEvent(QKeyEvent *event){
         }
     }
 }
-
-void AntSimulator::resizeEvent(QResizeEvent *event)
-{
-    QWidget::resizeEvent(event);
-
-    pauseOverlay_->setGeometry(rect());
-}
-
