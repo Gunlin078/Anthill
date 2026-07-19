@@ -37,3 +37,16 @@ void Resource::restore() {
     count_ = initialCount_;
     restorationDeadline_ = 0;
 }
+
+int Resource::pickUpPart(int amount)
+{
+    if (amount > count_){
+        int received = count_;
+        remove();
+        return received;
+    }
+    else{
+        count_ -= amount;
+        return amount;
+    }
+}

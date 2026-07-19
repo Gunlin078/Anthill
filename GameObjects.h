@@ -2,6 +2,7 @@
 #define GAMEOBJECTS_H
 #include <QStyleOptionGraphicsItem>
 #include <QRandomGenerator>
+#include <QGraphicsScene>
 #include <QGraphicsItem>
 #include <QDateTime>
 #include <QPainter>
@@ -19,7 +20,7 @@ public:
     ~Resource() override = default;
     void remove();
     void restore();
-
+    int pickUpPart(int amount);
 protected:
     Resource(QString name, QColor color, short count, short V)
         : name_(name)
@@ -95,7 +96,7 @@ private:
 //static object
 struct Wall: public GameObject, public QGraphicsItem{
     ~Wall() override = default;
-    Wall(int x,int y,int width,int length)
+    Wall(int x, int y, int width, int length)
         : coordinates_(x,y)
         , width_(width)
         , length_(length)

@@ -29,7 +29,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Ant.h Ant.cpp
         Configs.hpp
         GameObjects.cpp
-        PauseOverlay.h PauseOverlay.cpp
+        PauseOverlay.hpp
         CustomGraphicsView.hpp
 
     )

@@ -1,7 +1,7 @@
 #ifndef CUSTOMGRAPHICSVIEW_H
 #define CUSTOMGRAPHICSVIEW_H
 
-#include "PauseOverlay.h"
+#include "PauseOverlay.hpp"
 #include <QGraphicsView>
 #include <QWheelEvent>
 #include <QMouseEvent>

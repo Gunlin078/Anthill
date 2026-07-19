@@ -109,3 +109,19 @@ void Ant::updatePosition()
     }
     setPos(currentPos_);
 }
+
+Resource* Ant::resourceNearby()
+{
+    if (!scene()) return nullptr;
+
+    QPainterPath radiusPath;
+    radiusPath.addEllipse(this->pos(), 0.1, 0.1);
+
+    QList<QGraphicsItem*> itemsInRadius = scene()->items(radiusPath);
+
+    for (QGraphicsItem *item : itemsInRadius) {
+        if (Resource *res = dynamic_cast<Resource*>(item)){
+            return res;
+        }}
+    return nullptr;
+}
