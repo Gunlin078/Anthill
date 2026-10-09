@@ -13,8 +13,6 @@ public abstract class Ant : MonoBehaviour
         currentHealth = maxHealth;
     }
 
-    private bool isDead = false;
-
     public virtual void TakeDamage(int damage)
     {
         if (currentHealth <= 0 || damage <= 0) return;
