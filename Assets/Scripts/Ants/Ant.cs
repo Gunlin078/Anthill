@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public abstract class Ant : MonoBehaviour
+public abstract class Ant : MonoBehaviour , IDamageable
 {
     [Header("Base Ant Settings")]
     [SerializeField] protected float speed = 2f;
@@ -13,7 +13,7 @@ public abstract class Ant : MonoBehaviour
         currentHealth = maxHealth;
     }
 
-    public virtual void TakeDamage(int damage)
+    public void TakeDamage(int damage)
     {
         if (currentHealth <= 0 || damage <= 0) return;
 
