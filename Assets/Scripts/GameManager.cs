@@ -36,21 +36,16 @@ public class GameManager : MonoBehaviour
         switch (CurrentState)
         {
             case GameState.Gameplay:
-                Time.timeScale = 1f; // Запуск времени игры
+                Time.timeScale = 1f;
                 break;
             case GameState.Pause:
-                Time.timeScale = 0f; // Остановка времени (пауза)
-                break;
-            case GameState.GameOver:
                 Time.timeScale = 0f;
-                Debug.Log("Игра окончена! Показываем UI проигрыша.");
                 break;
         }
     }
 
     public void RestartGame()
     {
-        // Перезагрузка текущей сцены
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

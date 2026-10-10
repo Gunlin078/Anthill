@@ -1,31 +1,32 @@
 using UnityEngine;
 
-public abstract class Ant : MonoBehaviour , IDamageable
+public abstract class Ant : MonoBehaviour , IDamageable , IInitializable
 {
     [Header("Base Ant Settings")]
     [SerializeField] protected float speed = 2f;
-    [SerializeField] protected int maxHealth = 10;
+    [SerializeField] protected int maxHealth = 100;
 
-    protected int currentHealth;
+    protected int _currentHealth;
+    public int CurrentHealth => _currentHealth;
 
-    protected virtual void Awake()
+    void IInitializable.Initialize()
     {
-        currentHealth = maxHealth;
+        //if (isSpawned) break
+        _currentHealth = maxHealth;
     }
 
     public void TakeDamage(int damage)
     {
-        if (currentHealth <= 0 || damage <= 0) return;
+        if (CurrentHealth <= 0 || damage <= 0) return;
 
-        currentHealth -= damage;
+        _currentHealth -= damage;
 
-        if (currentHealth <= 0)
+        if (_currentHealth <= 0)
         {
-            currentHealth = 0;
+            _currentHealth = 0;
             Die();
         }
     }
-
 
     protected virtual void Die()
     {
