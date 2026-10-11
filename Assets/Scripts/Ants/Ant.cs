@@ -1,23 +1,23 @@
 using UnityEngine;
 
-public abstract class Ant : MonoBehaviour , IDamageable , IInitializable
+public abstract class Ant : MonoBehaviour, IDamageable
 {
     [Header("Base Ant Settings")]
+    public abstract AntType Type { get; }
     [SerializeField] protected float speed = 2f;
     [SerializeField] protected int maxHealth = 100;
 
-    protected int _currentHealth;
     public int CurrentHealth => _currentHealth;
+    protected int _currentHealth;
 
-    void IInitializable.Initialize()
+    protected virtual void Awake()
     {
-        //if (isSpawned) break
         _currentHealth = maxHealth;
     }
 
     public void TakeDamage(int damage)
     {
-        if (CurrentHealth <= 0 || damage <= 0) return;
+        if (damage <= 0) return;
 
         _currentHealth -= damage;
 
