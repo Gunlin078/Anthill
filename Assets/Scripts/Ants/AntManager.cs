@@ -45,7 +45,7 @@ public class AntManager : MonoBehaviour
             actionOnDestroy: (ant) => Destroy(ant.gameObject),
             collectionCheck: true,
             defaultCapacity: defaultCapacity,
-            maxSize: absoluteMaxSize // Пул готов вместить много, память не тратит
+            maxSize: absoluteMaxSize
         );
     }
 

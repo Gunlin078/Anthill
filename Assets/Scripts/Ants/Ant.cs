@@ -7,11 +7,14 @@ public abstract class Ant : MonoBehaviour, IDamageable
     [SerializeField] protected float speed = 2f;
     [SerializeField] protected int maxHealth = 100;
 
+    public AntColony Colony { get; private set; }
     public int CurrentHealth => _currentHealth;
     protected int _currentHealth;
 
-    protected virtual void Awake()
+    protected void Spawn(AntColony colony, Vector2 spawnPosition)
     {
+        Colony = colony;
+        transform.position = spawnPosition;
         _currentHealth = maxHealth;
     }
 
@@ -24,12 +27,14 @@ public abstract class Ant : MonoBehaviour, IDamageable
         if (_currentHealth <= 0)
         {
             _currentHealth = 0;
-            Die();
+            TurnOff();
         }
     }
 
-    protected virtual void Die()
+    public virtual void TurnOff()
     {
-        Destroy(gameObject);
+        Colony = null;
+        transform.localPosition = Vector2.zero;
+        this.enabled = false;
     }
 }
