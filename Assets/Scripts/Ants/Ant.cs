@@ -7,25 +7,28 @@ public abstract class Ant : MonoBehaviour, IDamageable
     [SerializeField] protected int maxHealth = 100;
 
     public abstract AntType Type { get; }
-    public abstract AntColony Colony { get; protected set; } 
+    public virtual AntColony Colony { get; protected set; } 
 
     public int CurrentHealth => _currentHealth;
     protected int _currentHealth;
 
-    private bool _isInitialized; 
+    private bool _isInitializedCorrectly;
 
-    protected virtual void Awake()
+    //                                              Unity functions
+
+    protected virtual void Start()
     {
-        if (!_isInitialized && Colony == null)
+        if (!_isInitializedCorrectly || Colony == null)
         {
-            Debug.LogError($"Error: {gameObject.name} was created via standard Instantiate or placed on scene! Use Ant.Spawn instead.", this);
+            Debug.LogError($"Error: {gameObject.name} was created via standard Instantiate or placed on scene! Use Ant.Spawn instead", this);
+            gameObject.SetActive(false);
             Destroy(gameObject);
         }
     }
 
     protected virtual void OnEnable()
     {
-        if (_isInitialized)
+        if (_isInitializedCorrectly)
         {
             ResetState();
         }
@@ -33,15 +36,20 @@ public abstract class Ant : MonoBehaviour, IDamageable
 
     protected virtual void OnDisable()
     {
-        transform.localPosition = Vector2.zero; 
+        
     }
 
-    //                                              Фабричный метод
+    //                                              Custom functions
 
     public static T Spawn<T>(T prefab, AntColony colony) where T : Ant
     {
         if (prefab == null) return null;
 
+        if (colony == null)
+        {
+            Debug.LogError($"[AntSpawn] Cannot spawn ant {prefab.name} without a valid AntColony!");
+            return null;
+        }
 
         T newAnt = Instantiate(prefab);
         newAnt.InternalInit(colony);
@@ -52,7 +60,7 @@ public abstract class Ant : MonoBehaviour, IDamageable
     private void InternalInit(AntColony colony)
     {
         Colony = colony;
-        _isInitialized = true;
+        _isInitializedCorrectly = true;
 
         if (!this.enabled)  {   this.enabled = true; }
         else                {   ResetState();        }
@@ -61,10 +69,7 @@ public abstract class Ant : MonoBehaviour, IDamageable
     protected virtual void ResetState()
     {
         _currentHealth = maxHealth;
-        if (Colony != null)
-        {
-            transform.position = Colony.transform.position;
-        }
+        transform.position = Colony.transform.position;
     }
 
     public void TakeDamage(int damage)
@@ -82,7 +87,7 @@ public abstract class Ant : MonoBehaviour, IDamageable
 
     protected virtual void Die()
     {
-        this.enabled = false;
+        gameObject.SetActive(false);
         //возврат в пул
     }
 }
