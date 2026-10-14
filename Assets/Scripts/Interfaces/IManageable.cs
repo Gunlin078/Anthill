@@ -1,5 +1,6 @@
-internal interface IManageable
+using UnityEngine;
+interface IManageable
 {
-    void Activate();
+    void Activate(Vector2 spawnPosition);
     void Deactivate();
 }
