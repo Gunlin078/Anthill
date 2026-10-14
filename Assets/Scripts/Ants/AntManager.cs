@@ -6,15 +6,15 @@ using UnityEngine.Pool;
 public class AntManager : MonoBehaviour
 {
     [Header("Префабы муравьев")]
-    [SerializeField] private Ant workerPrefab;
-    [SerializeField] private Ant warriorPrefab;
+    [SerializeField] private Ant _workerPrefab;
+    [SerializeField] private Ant _warriorPrefab;
 
     [Header("Настройки пулинга")]
-    [SerializeField] private int defaultCapacity = 20;
-    [SerializeField] private int absoluteMaxSize = 5000;
+    [SerializeField] private int _defaultCapacity = 20;
+    [SerializeField] private int _absoluteMaxSize = 5000;
 
     [Header("Динамический игровой лимит")]
-    [SerializeField] private int maxCurrentPoolSize = 50;
+    [SerializeField] private int _maxCurrentPoolSize = 50;
 
     private Dictionary<AntType, ObjectPool<Ant>> _pools;
 
@@ -29,45 +29,38 @@ public class AntManager : MonoBehaviour
             _activeCounts[type] = 0;
         }
 
-        _pools[AntType.Worker] = CreatePoolForType(AntType.Worker, workerPrefab);
-        _pools[AntType.Warrior] = CreatePoolForType(AntType.Warrior, warriorPrefab);
+        _pools[AntType.Worker] = CreatePoolForType(AntType.Worker, _workerPrefab);
+        _pools[AntType.Warrior] = CreatePoolForType(AntType.Warrior, _warriorPrefab);
     }
 
     private ObjectPool<Ant> CreatePoolForType(AntType type, Ant prefab)
     {
         return new ObjectPool<Ant>(
             createFunc: () => Instantiate(prefab, transform),
-            actionOnGet: (ant) => ant.gameObject.SetActive(true),
-            actionOnRelease: (ant) => {
-                ant.ResetState();
-                ant.gameObject.SetActive(false);
-            },
+            actionOnGet: (ant) => ant.Spawn(),
+            actionOnRelease: (ant) => ant.TurnOff(),
             actionOnDestroy: (ant) => Destroy(ant.gameObject),
             collectionCheck: true,
-            defaultCapacity: defaultCapacity,
-            maxSize: absoluteMaxSize
+            defaultCapacity: _defaultCapacity,
+            maxSize: _absoluteMaxSize
         );
     }
 
     /// <summary>
-    /// Изменить разрешенный максимум муравьев во время игры (например, при апгрейде)
+    /// Change the maximum allowed number of ants during the game
     /// </summary>
     public void SetMaxCurrentPoolSize(int newLimit)
     {
-        maxCurrentPoolSize = newLimit;
-        Debug.Log($"[AntManager] Игровой лимит муравьев увеличен до: {maxCurrentPoolSize}");
+        _maxCurrentPoolSize = newLimit;
+        Debug.Log($"[AntManager] Игровой лимит муравьев увеличен до: {_maxCurrentPoolSize}");
     }
-
-    // ==========================================
-    // Public API с учетом лимита
-    // ==========================================
 
     public Ant GetAnt(AntType type)
     {
         // Проверяем, не достигли ли мы ТЕКУЩЕГО игрового лимита
-        if (_activeCounts[type] >= maxCurrentPoolSize)
+        if (_activeCounts[type] >= _maxCurrentPoolSize)
         {
-            Debug.LogWarning($"[AntManager] Нельзя создать {type}. Достигнут текущий лимит: {maxCurrentPoolSize}");
+            Debug.LogWarning($"[AntManager] Нельзя создать {type}. Достигнут текущий лимит: {_maxCurrentPoolSize}");
             return null; // Возвращаем null, игра понимает, что лимит исчерпан
         }
 
@@ -87,9 +80,8 @@ public class AntManager : MonoBehaviour
         if (_pools.TryGetValue(ant.Type, out var pool))
         {
             pool.Release(ant);
-            _activeCounts[ant.Type]--; // Уменьшаем счетчик активных, освобождая место
+            _activeCounts[ant.Type]--;
 
-            // Защита от ухода счетчика в минус (на всякий случай)
             if (_activeCounts[ant.Type] < 0) _activeCounts[ant.Type] = 0;
         }
     }

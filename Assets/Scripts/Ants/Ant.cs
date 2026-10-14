@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public abstract class Ant : MonoBehaviour, IDamageable
+public abstract class Ant : MonoBehaviour, IDamageable , IManageable
 {
     [Header("Base Ant Settings")]
     public abstract AntType Type { get; }
@@ -11,7 +11,7 @@ public abstract class Ant : MonoBehaviour, IDamageable
     public int CurrentHealth => _currentHealth;
     protected int _currentHealth;
 
-    protected void Spawn(AntColony colony, Vector2 spawnPosition)
+    protected void Activate(AntColony colony, Vector2 spawnPosition)
     {
         Colony = colony;
         transform.position = spawnPosition;
@@ -27,11 +27,11 @@ public abstract class Ant : MonoBehaviour, IDamageable
         if (_currentHealth <= 0)
         {
             _currentHealth = 0;
-            TurnOff();
+            Deactivate();
         }
     }
 
-    public virtual void TurnOff()
+    public virtual void Deactivate()
     {
         Colony = null;
         transform.localPosition = Vector2.zero;
