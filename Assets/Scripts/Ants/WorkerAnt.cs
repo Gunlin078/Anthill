@@ -1,16 +1,20 @@
+using System.Collections;
+using UnityEngine.AI;
 using UnityEngine;
 
-public class WorkerAnt : MonoBehaviour
+public class WorkerAnt : Ant
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    private Coroutine resourceLoopCoroutine;
 
-    // Update is called once per frame
-    void Update()
+    private void StartResourceLoop(Vector2 targetPos)
     {
-        
+        if (resourceLoopCoroutine == null)
+        {
+            resourceLoopCoroutine = StartCoroutine(ResourceLoop(targetPos));
+        }
+    }
+    private IEnumerator ResourceLoop(Vector2 targetPos)
+    {
+        return y;
     }
 }
