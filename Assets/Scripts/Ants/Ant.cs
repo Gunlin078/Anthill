@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public abstract class Ant : MonoBehaviour, IDamageable
@@ -13,6 +14,8 @@ public abstract class Ant : MonoBehaviour, IDamageable
     protected int _currentHealth;
 
     private bool _isInitializedCorrectly;
+
+    private Coroutine resourceLoopCoroutine;
 
     //                                              Unity functions
 
@@ -34,13 +37,19 @@ public abstract class Ant : MonoBehaviour, IDamageable
         }
     }
 
-    protected virtual void OnDisable()
-    {
-        
-    }
-
     //                                              Custom functions
 
+    private void StartResourceLoop(Vector2 targetPos) 
+    {
+        if (resourceLoopCoroutine == null)
+        {
+            resourceLoopCoroutine = StartCoroutine(ResourceLoop(targetPos));
+        }
+    }
+    private IEnumerator ResourceLoop(Vector2 targetPos) 
+    {
+        return y ;
+    }
     public static T Spawn<T>(T prefab, AntColony colony) where T : Ant
     {
         if (prefab == null) return null;
