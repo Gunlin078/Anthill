@@ -5,5 +5,5 @@ public class ResourceData : ScriptableObject
 {
     public string resourceName;       
     public Sprite icon;               
-    public int maxStackSize = 99;
+    private int _capacity = 99;
 }

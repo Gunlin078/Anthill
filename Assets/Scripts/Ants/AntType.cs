@@ -1,6 +1,6 @@
 public enum AntType : byte
 {
-    Worker = 0,
-    Warrior = 1,
-    Queen = 2
+    None = 0,
+    Worker = 1,
+    Warrior = 2,
 }

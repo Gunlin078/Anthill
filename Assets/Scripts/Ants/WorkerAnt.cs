@@ -5,6 +5,7 @@ using UnityEngine;
 public class WorkerAnt : Ant
 {
     private Coroutine resourceLoopCoroutine;
+    private NavMeshAgent agent;
 
     private void StartResourceLoop(Vector2 targetPos)
     {
