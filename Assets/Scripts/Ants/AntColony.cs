@@ -76,17 +76,6 @@ public class AntColony : MonoBehaviour
         return null;
     }
 
-    public Ant SpawnAnt(AntType type)
-    {
-        if (_pools.TryGetValue(type, out var pool))
-        {
-            Ant ant = pool.Get();
-            _activeCounts[type]++;
-            return ant;
-        }
-        return null;
-    }
-
     public void DespawnAnt(AntType type, Ant ant)
     {
         if (_pools.TryGetValue(type, out var pool))
