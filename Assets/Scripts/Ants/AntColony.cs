@@ -84,4 +84,22 @@ public class AntColony : MonoBehaviour
             _activeCounts[type] = Mathf.Max(0, _activeCounts[type] - 1);
         }
     }
+
+    private void OnDestroy()
+    {
+        if (_pools == null) return;
+
+        foreach (var pool in _pools.Values)
+        {
+            pool.Clear();
+        }
+        _pools.Clear();
+    }
+
+    public int GetActiveAntCount(AntType type)
+    {
+        return _activeCounts.TryGetValue(type, out int count) ? count : 0;
+    }
+
+
 }
