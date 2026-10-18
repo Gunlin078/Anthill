@@ -53,7 +53,7 @@ public abstract class Ant : MonoBehaviour, IDamageable
         return newAnt;
     }
 
-    private void InternalInit(AntColony colony)
+    protected void InternalInit(AntColony colony)
     {
         Colony = colony;
         _isInitializedCorrectly = true;
