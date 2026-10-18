@@ -33,16 +33,16 @@ public class AntManager : MonoBehaviour
         _pools[AntType.Warrior] = CreatePoolForType(AntType.Warrior, _warriorPrefab);
     }
 
-    private ObjectPool<Ant> CreatePoolForType(AntType type, Ant prefab)
+    private ObjectPool<Ant> CreatePoolForType(AntType type, Ant prefab, AntColony colony)
     {
         return new ObjectPool<Ant>(
-            createFunc: () => Instantiate(prefab, transform),
-            actionOnGet: (ant) => ant.Spawn(),
-            actionOnRelease: (ant) => ant.TurnOff(),
+            createFunc: () => Ant.Spawn(prefab, colony),
+            actionOnGet:     (ant) => ant.gameObject.SetActive(true),
+            actionOnRelease: (ant) => ant.gameObject.SetActive(false),
             actionOnDestroy: (ant) => Destroy(ant.gameObject),
             collectionCheck: true,
             defaultCapacity: _defaultCapacity,
-            maxSize: _absoluteMaxSize
+            maxSize:         _absoluteMaxSize
         );
     }
 
@@ -57,17 +57,16 @@ public class AntManager : MonoBehaviour
 
     public Ant GetAnt(AntType type)
     {
-        // Проверяем, не достигли ли мы ТЕКУЩЕГО игрового лимита
         if (_activeCounts[type] >= _maxCurrentPoolSize)
         {
             Debug.LogWarning($"[AntManager] Нельзя создать {type}. Достигнут текущий лимит: {_maxCurrentPoolSize}");
-            return null; // Возвращаем null, игра понимает, что лимит исчерпан
+            return null;
         }
 
         if (_pools.TryGetValue(type, out var pool))
         {
             Ant ant = pool.Get();
-            _activeCounts[type]++; // Увеличиваем счетчик активных на сцене
+            _activeCounts[type]++;
             return ant;
         }
         return null;

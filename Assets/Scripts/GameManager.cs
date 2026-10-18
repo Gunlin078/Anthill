@@ -17,6 +17,14 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+
+
+            //   A.Initialize()
+            //   B.Initialize()
+            //   .....
+
+
+
         }
         else
         {
@@ -48,4 +56,6 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
+
+    // Not in use, needs repair
 }

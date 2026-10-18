@@ -4,18 +4,21 @@ using UnityEngine;
 
 public class WorkerAnt : Ant
 {
-    private Coroutine resourceLoopCoroutine;
-    private NavMeshAgent agent;
-
+    private Coroutine _resourceLoopCoroutine;
+    private NavMeshAgent _agent;
+    private ResourceType _resourceType;
+    /*
     private void StartResourceLoop(Vector2 targetPos)
     {
-        if (resourceLoopCoroutine == null)
+        if (_resourceLoopCoroutine == null)
         {
-            resourceLoopCoroutine = StartCoroutine(ResourceLoop(targetPos));
+            _resourceLoopCoroutine = StartCoroutine(ResourceLoop(targetPos));
         }
     }
+    
     private IEnumerator ResourceLoop(Vector2 targetPos)
     {
         return y;
     }
+    */
 }
