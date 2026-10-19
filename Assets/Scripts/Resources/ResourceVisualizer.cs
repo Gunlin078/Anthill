@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "ResourceData", menuName = "Scriptable Objects/ResourceData")]
+[CreateAssetMenu(fileName = "ResourceVisualizer", menuName = "Scriptable Objects/ResourceVisualizer")]
 public class ResourceData : ScriptableObject
 {
     [SerializeField] private ResourceType _type;
