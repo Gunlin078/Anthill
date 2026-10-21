@@ -1,18 +1,5 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "ResourceVisualizer", menuName = "Scriptable Objects/ResourceVisualizer")]
-public class ResourceData : ScriptableObject
-{
-    [SerializeField] private ResourceType _type;
-    [SerializeField] private Sprite _sprite;
-    [SerializeField] private int _capacity = 99;
-
-    public ResourceType Type => _type;
-    public Sprite Sprite => _sprite;
-    public int Capacity => _capacity;
-}
-
-
 [RequireComponent(typeof(SpriteRenderer))]
 public class ResourceVisualizer : MonoBehaviour
 {
