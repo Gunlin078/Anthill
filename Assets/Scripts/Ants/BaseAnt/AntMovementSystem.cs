@@ -1,16 +1,16 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-[DefaultExecutionOrder(-1000)] // Awake раньше AntColony, чтобы Instance уже был
+[DefaultExecutionOrder(-1000)]
 public sealed class AntMovementSystem : MonoBehaviour
 {
     public static AntMovementSystem Instance { get; private set; }
 
     [Header("Separation")]
-    [Tooltip("Радиус расталкивания. Ставь ~= диаметру спрайта + запас.")]
+    [Tooltip("Радиус расталкивания. Ставить примерно как диаметр спрайта + запас")]
     [SerializeField] private float separationRadius = 0.5f;
 
-    [Tooltip("Как часто пересчитывать расталкивание (сек). 0.05 = 20 Гц.")]
+    [Tooltip("Как часто пересчитывать расталкивание (сек). 0.05 = 20 Гц")]
     [SerializeField] private float separationInterval = 0.05f;
 
     [Tooltip("true = FixedUpdate (стабильнее), false = Update (плавнее).")]
