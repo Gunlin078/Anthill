@@ -14,7 +14,7 @@ public class AntColony : MonoBehaviour
     [SerializeField] private int _maxPoolSize = 100;
 
     [Header("Current ant limit")]
-    [SerializeField] private int _currentMaxPoolSize = 50;
+    [SerializeField] private int _currentMaxPoolSize = 20;
 
     private Dictionary<AntType, ObjectPool<Ant>> _pools;
     private Dictionary<AntType, int> _activeCounts = new Dictionary<AntType, int>();
@@ -100,6 +100,4 @@ public class AntColony : MonoBehaviour
     {
         return _activeCounts.TryGetValue(type, out int count) ? count : 0;
     }
-
-
 }
