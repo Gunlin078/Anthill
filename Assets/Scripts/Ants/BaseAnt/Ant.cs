@@ -4,30 +4,34 @@ using UnityEngine;
 public abstract class Ant : MonoBehaviour, IDamageable
 {
     [Header("Base Ant Settings")]
-    [SerializeField] protected float speed = 2f;
-    [SerializeField] protected int maxHealth = 100;
+    [SerializeField] protected float _speed = 2f;              // in Data
+    [SerializeField] protected int _maxHealth = 100;           // in Data
 
     [Header("Movement")]
-    [SerializeField] protected float arriveDistance = 0.08f;
-    [SerializeField] protected float slowdownRadius = 0.5f;
+    [SerializeField] protected float _arriveDistance = 0.08f;  // in Data
+    [SerializeField] protected float _slowdownRadius = 0.5f;   // in Data
     [Tooltip("Вес расталкивания. 1.5–2 = муравьи обходят друг друга.")]
-    [SerializeField] protected float separationWeight = 1.5f;
+    [SerializeField] protected float _separationWeight = 1.5f; // in Data
 
-    public virtual AntColony Colony { get; protected set; }
-    public int CurrentHealth => _currentHealth;
-    protected int _currentHealth;
-    protected bool _isInitializedCorrectly;
-
-    // Movement state
     protected Vector2 _position;
     protected Vector2 _target;
     protected Vector2 _separation;
     protected bool _isMoving;
-
     public bool IsMoving => _isMoving;
     public Vector2 Position => _position;
 
-    //                                              Unity functions
+    public virtual AntColony Colony { get; protected set; }
+    public AntType Type { get; protected set; }
+    public int CurrentHealth => _currentHealth;
+    protected int _currentHealth;
+
+    protected bool _isInitializedCorrectly;
+
+
+
+    //                                                            Unity functions
+
+
 
     protected virtual void Start()
     {
@@ -41,21 +45,22 @@ public abstract class Ant : MonoBehaviour, IDamageable
 
     protected virtual void OnEnable()
     {
-        if (_isInitializedCorrectly)
-        {
-            ResetState();
-            AntMovementSystem.Instance?.Register(this);
-        }
+        if (!_isInitializedCorrectly) return;
+
+        ResetState();
+        AntMovementSystem.Instance.Register(this);
     }
 
     protected virtual void OnDisable()
     {
-        AntMovementSystem.Instance?.Unregister(this);
+        AntMovementSystem.Instance.Unregister(this);
     }
 
-    //                                              Custom functions
 
-    public static T Spawn<T>(T prefab, AntColony colony) where T : Ant
+    //                                              Spawn / Init
+
+
+    public static T Spawn<T>(T prefab, AntColony colony, AntType type) where T : Ant
     {
         if (prefab == null) return null;
         if (colony == null)
@@ -65,26 +70,25 @@ public abstract class Ant : MonoBehaviour, IDamageable
         }
 
         T newAnt = Instantiate(prefab);
-        newAnt.InternalInit(colony);
+        newAnt.InternalInit(colony, type);
         return newAnt;
     }
 
-    protected void InternalInit(AntColony colony)
+    protected void InternalInit(AntColony colony, AntType type)
     {
         Colony = colony;
+        Type = type;
         _isInitializedCorrectly = true;
+        ResetState();
 
-        if (!this.enabled) this.enabled = true;
-        else ResetState();
-
-        // Регистрация именно здесь — OnEnable при Instantiate ещё не знает про colony
-        AntMovementSystem.Instance?.Register(this);
+        if (gameObject.activeInHierarchy)
+            AntMovementSystem.Instance.Register(this);
     }
 
     protected virtual void ResetState()
     {
-        _currentHealth = maxHealth;
-        _position = Colony.transform.position;
+        _currentHealth = _maxHealth;
+        _position = Colony != null ? (Vector2)Colony.transform.position : (Vector2)transform.position;
         transform.position = _position;
         _target = _position;
         _separation = Vector2.zero;
@@ -93,56 +97,49 @@ public abstract class Ant : MonoBehaviour, IDamageable
 
     //                                              Movement API
 
-    /// <summary>Запустить движение к цели. Fire-and-forget.</summary>
     public void StartMove(Vector2 target)
     {
         _target = target;
         _isMoving = true;
     }
 
-    /// <summary>Дождаться прибытия (если нужно). Не используй 500 штук разом — просто жди IsMoving.</summary>
-    public IEnumerator MoveTo(Vector3 target)
+    public void StopMove()
     {
-        StartMove(target);
-        while (_isMoving) yield return null;
+        _isMoving = false;
+        _target = _position;
     }
 
-    // Вызывается системой
     internal void ApplySeparation(Vector2 sep) => _separation = sep;
 
     internal void MovementTick(float dt)
     {
-        // Ничего не делаем, если стоим и никто не толкает
         if (!_isMoving && _separation.sqrMagnitude < 0.0001f) return;
 
         Vector2 toTarget = _target - _position;
         float dist = toTarget.magnitude;
-        bool atTarget = dist <= arriveDistance;
+        bool atTarget = dist <= _arriveDistance;
 
         Vector2 move = Vector2.zero;
 
         if (!atTarget)
         {
             Vector2 dir = toTarget / dist;
-            float slowdown = Mathf.Clamp01(dist / slowdownRadius);
-            move = dir * (speed * slowdown);
+            float slowdown = Mathf.Clamp01(dist / _slowdownRadius);
+            move = dir * (_speed * slowdown);
         }
 
-        // Добавляем расталкивание (затухающее к цели)
-        move += _separation * separationWeight;
+        move += _separation * _separationWeight;
 
-        // Кэп по скорости — separation не должен «катапультировать» муравья
-        float cap = speed;
+        float cap = _speed;
         if (move.sqrMagnitude > cap * cap)
             move = move.normalized * cap;
 
-        if (move.sqrMagnitude > 0.0000001f)
+        if (move.sqrMagnitude > 1e-7f)
         {
             _position += move * dt;
             transform.position = _position;
         }
 
-        // Достигли цели и никто не мешает — останавливаемся
         if (_isMoving && atTarget && _separation.sqrMagnitude < 0.04f)
             _isMoving = false;
     }
@@ -158,7 +155,9 @@ public abstract class Ant : MonoBehaviour, IDamageable
 
     protected virtual void Die()
     {
-        gameObject.SetActive(false);
-        // возврат в пул — делай через Colony.DespawnAnt(...) — см. примечание ниже
+        if (Colony != null)
+            Colony.DespawnAnt(Type, this);
+        else
+            gameObject.SetActive(false);
     }
 }

@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
 public class AntColony : MonoBehaviour
 {
-    [Header("Prefabs")]
+    [Header("Prefabs (должны быть INACTIVE!)")]
     [SerializeField] private Ant _workerPrefab;
     [SerializeField] private Ant _warriorPrefab;
 
@@ -17,87 +17,93 @@ public class AntColony : MonoBehaviour
     [SerializeField] private int _currentMaxPoolSize = 20;
 
     private Dictionary<AntType, ObjectPool<Ant>> _pools;
-    private Dictionary<AntType, int> _activeCounts = new Dictionary<AntType, int>();
+    private Dictionary<AntType, int> _activeCounts = new();
 
     private void Awake()
     {
         _pools = new Dictionary<AntType, ObjectPool<Ant>>();
 
         foreach (AntType type in Enum.GetValues(typeof(AntType)))
-        {
             _activeCounts[type] = 0;
-        }
 
-        _pools[AntType.Worker]  = CreatePoolForType(_workerPrefab);
-        _pools[AntType.Warrior] = CreatePoolForType(_warriorPrefab);
+        _pools[AntType.Worker] = CreatePoolForType(_workerPrefab, AntType.Worker);
+        _pools[AntType.Warrior] = CreatePoolForType(_warriorPrefab, AntType.Warrior);
     }
 
-    private ObjectPool<Ant> CreatePoolForType(Ant prefab)
+    private ObjectPool<Ant> CreatePoolForType(Ant prefab, AntType type)
     {
+        if (prefab == null)
+        {
+            Debug.LogWarning($"[AntColony] Pool for {type} has no prefab assigned.");
+            return null;
+        }
+
         return new ObjectPool<Ant>(
-            createFunc: () => Ant.Spawn(prefab, this),
-            actionOnGet:     (ant) => ant.gameObject.SetActive(true),
-            actionOnRelease: (ant) => ant.gameObject.SetActive(false),
-            actionOnDestroy: (ant) => Destroy(ant.gameObject),
+            createFunc: () =>
+            {
+                var ant = Ant.Spawn(prefab, this, type);
+                // Если префаб оказался активным — гасим. Пул держит объекты неактивными.
+                if (ant != null && ant.gameObject.activeSelf)
+                    ant.gameObject.SetActive(false);
+                return ant;
+            },
+            actionOnGet: ant => ant.gameObject.SetActive(true),
+            actionOnRelease: ant => ant.gameObject.SetActive(false),
+            actionOnDestroy: ant => { if (ant != null) Destroy(ant.gameObject); },
             collectionCheck: true,
             defaultCapacity: _defaultCapacity,
-            maxSize:         _maxPoolSize
+            maxSize: _maxPoolSize
         );
     }
 
-    /// <summary>
-    /// Change the maximum allowed number of ants during the game
-    /// </summary>
     public void SetMaxCurrentPoolSize(int newLimit)
     {
         if (newLimit > _maxPoolSize)
-        {
-            Debug.Log($"[AntColony] The desired limit exceeds N: {_maxPoolSize}");
-        }
-        
+            Debug.LogWarning($"[AntColony] The desired limit exceeds {_maxPoolSize}.");
         _currentMaxPoolSize = newLimit;
-        Debug.Log($"[AntColony] The current colony ant limit has been increased to {_currentMaxPoolSize} (Max capacity: {_maxPoolSize})");
     }
 
     public Ant GetAnt(AntType type)
     {
+        if (!_pools.TryGetValue(type, out var pool) || pool == null) return null;
+
         if (_activeCounts[type] >= _currentMaxPoolSize)
         {
             Debug.LogWarning($"[AntColony] Cannot create {type}. Current limit: {_currentMaxPoolSize}");
             return null;
         }
 
-        if (_pools.TryGetValue(type, out var pool))
-        {
-            Ant ant = pool.Get();
-            _activeCounts[type]++;
-            return ant;
-        }
-        return null;
+        Ant ant = pool.Get();
+        if (ant == null) return null;
+        _activeCounts[type]++;
+        return ant;
     }
 
     public void DespawnAnt(AntType type, Ant ant)
     {
-        if (_pools.TryGetValue(type, out var pool))
+        if (ant == null) return;
+
+        // Уже в пуле — защита от двойного возврата (Die + внешний вызов).
+        if (!ant.gameObject.activeSelf) return;
+
+        if (_pools.TryGetValue(type, out var pool) && pool != null)
         {
-            pool.Release(ant);
+            pool.Release(ant); // actionOnRelease → SetActive(false) → OnDisable → Unregister
             _activeCounts[type] = Mathf.Max(0, _activeCounts[type] - 1);
         }
+        else
+        {
+            ant.gameObject.SetActive(false);
+        }
     }
+
+    public int GetActiveAntCount(AntType type)
+        => _activeCounts.TryGetValue(type, out int c) ? c : 0;
 
     private void OnDestroy()
     {
         if (_pools == null) return;
-
-        foreach (var pool in _pools.Values)
-        {
-            pool.Clear();
-        }
+        foreach (var pool in _pools.Values) pool?.Clear();
         _pools.Clear();
-    }
-
-    public int GetActiveAntCount(AntType type)
-    {
-        return _activeCounts.TryGetValue(type, out int count) ? count : 0;
     }
 }
