@@ -7,16 +7,16 @@ public sealed class AntMovementSystem : MonoBehaviour
     public static AntMovementSystem Instance { get; private set; }
 
     [Header("Separation")]
-    [Tooltip("Радиус взаимного отталкивания.")]
+    [Tooltip("Radius of mutual repulsion")]
     [SerializeField] private float _separationRadius = 0.5f;
 
-    [Tooltip("Как часто пересчитывать направление расталкивания.")]
+    [Tooltip("On how often to recalculate the pushing-apart direction")]
     [SerializeField] private float _separationInterval = 0.05f;
 
-    [Tooltip("За сколько секунд сила плавно доезжает до новой цели. ~50% от interval.")]
+    [Tooltip("How many seconds it takes for the force to smoothly reach a new target. ~50% of the interval")]
     [SerializeField] private float _separationSmoothing = 0.025f;
 
-    [Tooltip("Максимум модуля силы. Без clamp в плотной куче push улетает.")]
+    [Tooltip("Maximum of the force magnitude")]
     [SerializeField] private float _maxSeparationForce = 1.5f;
 
     [SerializeField] private bool _tickInFixedUpdate = true;
@@ -94,7 +94,6 @@ public sealed class AntMovementSystem : MonoBehaviour
         int n = _ants.Count;
         if (n == 0) return;
 
-        // 1) Редко: пересчитываем ЦЕЛЕВУЮ силу.
         if (currentTime >= _nextSepTime)
         {
             _nextSepTime = currentTime + Mathf.Max(0.0001f, _separationInterval);
@@ -104,7 +103,6 @@ public sealed class AntMovementSystem : MonoBehaviour
                 _targetPush[_ants[i]] = ComputeSeparation(_ants[i]);
         }
 
-        // 2) Каждый кадр: сглаживаем текущую силу к целевой и двигаем.
         bool smooth = _separationSmoothing > 0.0001f;
         float maxDelta = smooth ? (_maxSeparationForce / _separationSmoothing) * dt : 0f;
 

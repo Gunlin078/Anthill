@@ -5,7 +5,7 @@ using UnityEngine.Pool;
 
 public class AntColony : MonoBehaviour
 {
-    [Header("Prefabs (должны быть INACTIVE!)")]
+    [Header("Prefabs (Must be INACTIVE!)")]
     [SerializeField] private Ant _workerPrefab;
     [SerializeField] private Ant _warriorPrefab;
 
@@ -34,7 +34,7 @@ public class AntColony : MonoBehaviour
     {
         if (prefab == null)
         {
-            Debug.LogWarning($"[AntColony] Pool for {type} has no prefab assigned.");
+            Debug.LogWarning($"[AntColony] Pool for {type} has no prefab assigned");
             return null;
         }
 
@@ -42,7 +42,6 @@ public class AntColony : MonoBehaviour
             createFunc: () =>
             {
                 var ant = Ant.Spawn(prefab, this, type);
-                // Если префаб оказался активным — гасим. Пул держит объекты неактивными.
                 if (ant != null && ant.gameObject.activeSelf)
                     ant.gameObject.SetActive(false);
                 return ant;
@@ -59,7 +58,7 @@ public class AntColony : MonoBehaviour
     public void SetMaxCurrentPoolSize(int newLimit)
     {
         if (newLimit > _maxPoolSize)
-            Debug.LogWarning($"[AntColony] The desired limit exceeds {_maxPoolSize}.");
+            Debug.LogWarning($"[AntColony] The desired limit exceeds {_maxPoolSize}");
         _currentMaxPoolSize = newLimit;
     }
 
@@ -83,12 +82,11 @@ public class AntColony : MonoBehaviour
     {
         if (ant == null) return;
 
-        // Уже в пуле — защита от двойного возврата (Die + внешний вызов).
         if (!ant.gameObject.activeSelf) return;
 
         if (_pools.TryGetValue(type, out var pool) && pool != null)
         {
-            pool.Release(ant); // actionOnRelease → SetActive(false) → OnDisable → Unregister
+            pool.Release(ant);
             _activeCounts[type] = Mathf.Max(0, _activeCounts[type] - 1);
         }
         else
